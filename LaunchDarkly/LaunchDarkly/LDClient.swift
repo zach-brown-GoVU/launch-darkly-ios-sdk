@@ -498,7 +498,7 @@ public class LDClient {
      - parameter handler: The closure the SDK will execute when the feature flag changes.
     */
     public func observe(key: LDFlagKey, owner: LDObserverOwner, handler: @escaping LDFlagChangeHandler) {
-        os_log("%s flagKey: %s owner: %s", log: config.logger, type: .debug, typeName(and: #function), key, String(describing: owner))
+        os_log("%s called for flagKey: %s", log: config.logger, type: .debug, typeName(and: #function), key)
         flagChangeNotifier.addFlagChangeObserver(FlagChangeObserver(key: key, owner: owner, flagChangeHandler: handler))
     }
 
@@ -526,7 +526,7 @@ public class LDClient {
      - parameter handler: The LDFlagCollectionChangeHandler the SDK will execute 1 time when any of the observed feature flags change.
      */
     public func observe(keys: [LDFlagKey], owner: LDObserverOwner, handler: @escaping LDFlagCollectionChangeHandler) {
-        os_log("%s flagKeys: %s owner: %s", log: config.logger, type: .debug, typeName(and: #function), String(describing: keys), String(describing: owner))
+        os_log("%s called for flagKeys: %s", log: config.logger, type: .debug, typeName(and: #function), String(describing: keys))
         flagChangeNotifier.addFlagChangeObserver(FlagChangeObserver(keys: keys, owner: owner, flagCollectionChangeHandler: handler))
     }
 
@@ -553,7 +553,7 @@ public class LDClient {
      - parameter handler: The LDFlagCollectionChangeHandler the SDK will execute 1 time when any of the observed feature flags change.
      */
     public func observeAll(owner: LDObserverOwner, handler: @escaping LDFlagCollectionChangeHandler) {
-        os_log("%s owner: %s", log: config.logger, type: .debug, typeName(and: #function), String(describing: owner))
+        os_log("%s called.", log: config.logger, type: .debug, typeName(and: #function))
         flagChangeNotifier.addFlagChangeObserver(FlagChangeObserver(keys: LDFlagKey.anyKey, owner: owner, flagCollectionChangeHandler: handler))
     }
 
@@ -621,9 +621,9 @@ public class LDClient {
     }
 
     private func onFlagSyncComplete(result: FlagSyncResult) {
-        os_log("%s result: %s", log: config.logger, type: .debug, typeName(and: #function), String(describing: result))
         switch result {
         case let .flagCollection((flagCollection, etag)):
+            os_log("%s: got flag collection with %d flags.", log: config.logger, type: .debug, typeName(and: #function), flagCollection.flags.count)
             let oldStoredItems = flagStore.storedItems
             connectionInformation = ConnectionInformation.checkEstablishingStreaming(connectionInformation: connectionInformation)
             flagStore.replaceStore(newStoredItems: StoredItems(items: flagCollection.flags))
