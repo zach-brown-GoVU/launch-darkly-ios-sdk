@@ -22,8 +22,8 @@ final class Throttler: Throttling {
     let maxDelay: TimeInterval
     private let logger: OSLog
 
-    private (set) var runAttempts = -1
-    private (set) var workItem: DispatchWorkItem?
+    private(set) var runAttempts = -1
+    private(set) var workItem: DispatchWorkItem?
 
     init(
         logger: OSLog,

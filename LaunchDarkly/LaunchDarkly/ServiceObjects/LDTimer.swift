@@ -9,10 +9,10 @@ protocol TimeResponding {
 
 final class LDTimer: TimeResponding {
 
-    private (set) weak var timer: Timer?
+    private(set) weak var timer: Timer?
     private let fireQueue: DispatchQueue
     private let execute: () -> Void
-    private (set) var isCancelled: Bool = false
+    private(set) var isCancelled: Bool = false
     var fireDate: Date? { timer?.fireDate }
 
     init(withTimeInterval timeInterval: TimeInterval, fireQueue: DispatchQueue = DispatchQueue.main, fireAt: Date? = nil, execute: @escaping () -> Void) {

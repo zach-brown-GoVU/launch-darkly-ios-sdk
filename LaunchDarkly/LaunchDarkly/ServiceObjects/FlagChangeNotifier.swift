@@ -14,9 +14,9 @@ protocol FlagChangeNotifying {
 
 final class FlagChangeNotifier: FlagChangeNotifying {
     // Exposed for testing
-    private (set) var flagChangeObservers = [FlagChangeObserver]()
-    private (set) var flagsUnchangedObservers = [FlagsUnchangedObserver]()
-    private (set) var connectionModeChangedObservers = [ConnectionModeChangedObserver]()
+    private(set) var flagChangeObservers = [FlagChangeObserver]()
+    private(set) var flagsUnchangedObservers = [FlagsUnchangedObserver]()
+    private(set) var connectionModeChangedObservers = [ConnectionModeChangedObserver]()
     private var flagChangeQueue = DispatchQueue(label: "com.launchdarkly.FlagChangeNotifier.FlagChangeQueue")
     private var flagsUnchangedQueue = DispatchQueue(label: "com.launchdarkly.FlagChangeNotifier.FlagsUnchangedQueue")
     private var connectionModeChangedQueue = DispatchQueue(label: "com.launchdarkly.FlagChangeNotifier.ConnectionModeChangedQueue")

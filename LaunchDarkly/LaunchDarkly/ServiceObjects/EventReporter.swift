@@ -36,7 +36,7 @@ class EventReporter: EventReporting {
         set { timerQueue.sync { newValue ? startReporting() : stopReporting() } }
     }
 
-    private (set) var lastEventResponseDate: Date
+    private(set) var lastEventResponseDate: Date
 
     let service: DarklyServiceProvider
 
