@@ -853,7 +853,6 @@ final class FlagSynchronizerSpec: QuickSpec {
     }
 
     func pollingTimerFiresSpec() {
-        var syncResult: FlagSyncResult?
         describe("polling timer fires") {
             var testContext: TestContext!
 
