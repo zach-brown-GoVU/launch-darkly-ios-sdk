@@ -273,7 +273,7 @@ public class LDClient {
 
     let config: LDConfig
     let service: DarklyServiceProvider
-    let hooks: [Hook]
+    var hooks: [Hook]
     private(set) var context: LDContext
 
     /**
@@ -801,9 +801,36 @@ public class LDClient {
         for (name, mobileKey) in mobileKeys {
             var internalConfig = config
             internalConfig.mobileKey = mobileKey
-            let instance = LDClient(serviceFactory: serviceFactory, configuration: internalConfig, startContext: context, completion: completionCheck)
+            let instance: LDClient = LDClient(serviceFactory: serviceFactory, configuration: internalConfig, startContext: context, completion: completionCheck)
             instancesQueue.sync(flags: .barrier) {
                 LDClient.instances?[name] = instance
+            }
+
+            let sdkMetadata = SdkMetadata(name: SystemCapabilities.systemName, version: ReportingConsts.sdkVersion)
+            let environmentMetadata = EnvironmentMetadata(
+                applicationInfo: instance.environmentReporter.applicationInfo,
+                sdkMetadata: sdkMetadata,
+                credential: mobileKey
+            )
+
+            // add all the plugin hooks
+            for plugin in config.plugins {
+                // Catch to protect against any runtime exceptions from plugin
+                do {
+                    let pluginHooks = try plugin.getHooks(metadata: environmentMetadata)
+                    instance.hooks.append(contentsOf: pluginHooks)
+                } catch {
+                    os_log("Exception thrown getting hooks for plugin %@. Unable to get hooks, plugin will not be registered.", log: config.logger, type: .error, plugin.getMetadata().getName())
+                }
+            }
+
+            // now register the client with all the plugins
+            for plugin in config.plugins {
+                do {
+                    plugin.register(client: instance, metadata: environmentMetadata)
+                } catch {
+                    os_log("Exception thrown registering plugin %@.", log: config.logger, type: .error, plugin.getMetadata().getName())
+                }
             }
         }
 
@@ -894,7 +921,7 @@ public class LDClient {
 
     private init(serviceFactory: ClientServiceCreating, configuration: LDConfig, startContext: LDContext?, completion: (() -> Void)? = nil) {
         self.serviceFactory = serviceFactory
-        self.hooks = configuration.hooks
+        self.hooks = Array(configuration.hooks)
         environmentReporter = self.serviceFactory.makeEnvironmentReporter(config: configuration)
         flagCache = self.serviceFactory.makeFeatureFlagCache(mobileKey: configuration.mobileKey, maxCachedContexts: configuration.maxCachedContexts)
         flagStore = self.serviceFactory.makeFlagStore()
