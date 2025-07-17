@@ -1,7 +1,7 @@
 import Foundation
 import LDSwiftEventSource
 import OSLog
-import DataCompression
+import LDDataCompression
 
 typealias ServiceResponse = (data: Data?, urlResponse: URLResponse?, error: Error?, etag: String?)
 typealias ServiceCompletionHandler = (ServiceResponse) -> Void
